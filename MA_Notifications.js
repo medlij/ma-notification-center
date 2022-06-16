@@ -2,12 +2,13 @@
 const SQSServices = require("./sqsServices.js");
 const EmailValidator = require("email-validator");
 
-class NotificationCenter {
+class MA_Notifications {
   sqsServices = new SQSServices();
+  arn = "https://sqs.eu-central-1.amazonaws.com/059256371462/notifications-"
   constructor() {}
 
   async sendSMS(data) {
-    var url = process.env.arn + "sms";
+    var url = this.arn + "sms";
     if (data["phonenumber"] && data["text"]) {
       var phonenumber = data["phonenumber"];
       var text = data["text"];
@@ -43,7 +44,7 @@ class NotificationCenter {
   }
 
   async sendEmail(body) {
-    var url = process.env.arn + "email";
+    var url = this.arn + "email";
     if (body["message"] && body["to_email"]) {
       if (body["message"]["subject"]) {
         var subject = body["message"]["subject"];
@@ -96,7 +97,7 @@ class NotificationCenter {
   }
 
   async sendTelegram(data) {
-    var url = process.env.arn + "telegram";
+    var url = this.arn + "telegram";
     if (data["text"] && data["chat_id"]) {
       var chat_id = data["chat_id"];
       var text = data["text"];
@@ -130,4 +131,4 @@ class NotificationCenter {
   }
 }
 
-module.exports = NotificationCenter;
+module.exports = MA_Notifications;

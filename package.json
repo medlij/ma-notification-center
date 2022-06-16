@@ -2,5 +2,27 @@
   "dependencies": {
     "aws-sdk": "^2.1154.0",
     "email-validator": "^2.0.4"
-  }
+  },
+  "name": "ma-notification-center",
+  "version": "1.0.1",
+  "description": "a package to use internal notifications for MobileArts",
+  "main": "MA_Notifications.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/medlij/ma-notification-center.git"
+  },
+  "keywords": [
+    "notifications",
+    "mobilearts"
+  ],
+  "author": "fatima medlij",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/medlij/ma-notification-center/issues"
+  },
+  "homepage": "https://github.com/medlij/ma-notification-center#readme"
 }
