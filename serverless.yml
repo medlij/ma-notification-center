@@ -1,0 +1,18 @@
+service: ma-notification-center
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  iam:
+    role:
+       arn:aws:iam::059256371462:role/mobiboxsls-dev-eu-central-1-lambdaRole
+  environment:
+    arn : https://sqs.eu-central-1.amazonaws.com/059256371462/notifications-
+
+
+functions:
+  Main:
+    handler: handler.Main
+
