@@ -4,130 +4,138 @@ const EmailValidator = require("email-validator");
 
 class MA_Notifications {
   sqsServices = new SQSServices();
-  arn = "https://sqs.eu-central-1.amazonaws.com/059256371462/notifications-"
+  arn = "https://sqs.eu-central-1.amazonaws.com/059256371462/notifications-";
   constructor() {}
 
-  async sendSMS(data) {
-    var url = this.arn + "sms";
-    if (data["phonenumber"] && data["text"]) {
-      var phonenumber = data["phonenumber"];
-      var text = data["text"];
-
-      if (text.length < 3) {
-        console.log("text is too short");
-        return;
-      }
+  validateSmsParams(phonenumbers, text) {
+    for (let i = 0; i < phonenumbers.length; i++) {
       if (
-        phonenumber.toString().length <= 6 ||
-        phonenumber.toString().length > 15
+        phonenumbers[i].toString().length <= 6 ||
+        phonenumbers[i].toString().length > 15
       ) {
-        console.log("not a valid phone number");
+        console.log("not a valid phone number", phonenumbers[i]);
         return;
       }
+    }
+    if (text.length < 3) {
+      console.log("text is too short");
+      return;
+    }
 
-      if (typeof text != "string") {
-        console.log("invalid text");
-        return;
-      }
+    if (typeof text != "string") {
+      console.log("invalid text");
+      return;
+    }
+    return true;
+  }
 
-      var params = {
-        phonenumber: phonenumber,
+  async sendSMS(phonenumbers, text) {
+    var url = this.arn + "sms";
+    let ok_to_send = this.validateSmsParams(phonenumbers, text);
+    if (ok_to_send === true) {
+      let sms_params = {
+        phonenumbers: phonenumbers,
         text: text,
       };
-
-      console.log(params);
-      this.sqsServices.PushToSQS(params, url);
+      return await this.sqsServices.PushToSQS(sms_params, url);
     } else {
-      console.log("phone number and text fields are required parameters");
-      return;
+      return "SMS not sent";
     }
   }
 
-  async sendEmail(body) {
+  validateEmailParams(to_emails, cc_emails, subject, body_text, body_html) {
+    for (let i = 0; i < to_emails.length; i++) {
+      if (EmailValidator.validate(to_emails[i]) == false) {
+        console.log("invalid to email address", to_emails[i]);
+        return;
+      }
+    }
+
+    for (let i = 0; i < cc_emails.length; i++) {
+      if (EmailValidator.validate(cc_emails[i]) == false) {
+        console.log("invalid cc email address", cc_emails[i]);
+        return;
+      }
+    }
+
+    if (subject == "" && body_text == "" && body_html == "") {
+      console.log("subject and body are empty");
+      return;
+    }
+    if (subject == "") {
+      console.log("subject cannot be empty");
+      return;
+    }
+    if (body_html == "" && body_text == "") {
+      console.log("body of email cannot be empty");
+      return;
+    }
+
+    return true;
+  }
+
+  async sendEmail(to_emails, cc_emails, subject, body_text, body_html) {
     var url = this.arn + "email";
-    if (body["message"] && body["to_email"]) {
-      if (body["message"]["subject"]) {
-        var subject = body["message"]["subject"];
-      } else {
-        var subject = "";
-      }
-
-      if (body["message"]["body_text"]) {
-        var body_text = body["message"]["body_text"];
-      } else {
-        var body_text = "";
-      }
-
-      if (body["message"]["body_html"]) {
-        var body_html = body["message"]["body_html"];
-      } else {
-        var body_html = "";
-      }
-
-      if (EmailValidator.validate(body["to_email"]) == false) {
-        console.log("invalid to email address");
-        return;
-      }
-      if (body["cc_email"]) {
-        if (EmailValidator.validate(body["cc_email"]) == false) {
-          console.log("invalid cc email address");
-          return;
-        }
-      }
-      if (subject == "" && body_text == "" && body_html == "") {
-        console.log("message object is empty");
-        return;
-      }
-      if (subject == "") {
-        console.log("subject cannot be empty");
-        return;
-      }
-      if (body_html == "" && body_text == "") {
-        console.log("body of email cannot be empty");
-        return;
-      }
-
-      this.sqsServices.PushToSQS(body, url);
+    let ok_to_send = this.validateEmailParams(
+      to_emails,
+      cc_emails,
+      subject,
+      body_text,
+      body_html
+    );
+    if (ok_to_send === true) {
+      let email_params = {
+        to_emails: to_emails,
+        cc_emails: cc_emails,
+        message: {
+          subject: subject,
+          body_text: body_text,
+          body_html: body_html,
+        },
+      };
+      return await this.sqsServices.PushToSQS(email_params, url);
     } else {
-      console.log(
-        "to email address , subject and email body are required fields"
-      );
-      return;
+      return "Email not sent";
     }
   }
 
-  async sendTelegram(data) {
+  async sendTelegram(chat_ids, text) {
     var url = this.arn + "telegram";
-    if (data["text"] && data["chat_id"]) {
-      var chat_id = data["chat_id"];
-      var text = data["text"];
 
-      if (text.length < 3) {
-        console.log("text is too short");
-        return;
-      }
-
-      if (chat_id.toString().length <= 6 || chat_id.toString().length > 15) {
-        console.log("not a valid chat id");
-        return;
-      }
-
-      if (typeof text != "string") {
-        console.log("invalid text");
-        return;
-      }
-
-      var params = {
-        chat_id: chat_id,
+    let ok_to_send = this.validateTelegramParams(chat_ids, text);
+    if (ok_to_send === true) {
+      let telegram_params = {
+        chat_ids: chat_ids,
         text: text,
       };
-
-      console.log(params);
-      this.sqsServices.PushToSQS(params, url);
+      return await this.sqsServices.PushToSQS(telegram_params, url);
     } else {
-      console.log("chat id and text are required fields");
+      return "Telegram message not sent";
+    }
+  }
+
+  validateTelegramParams(chat_ids, text) {
+    for (let i = 0; i < chat_ids.length; i++) {
+      if (
+        chat_ids[i].toString().length <= 6 ||
+        chat_ids[i].toString().length > 15
+      ) {
+        console.log("not a valid chat id", chat_ids[i]);
+        return;
+      }
+    }
+
+    if (text.length < 3) {
+      console.log("text is too short");
       return;
     }
+
+    if (typeof text != "string") {
+      console.log("invalid text");
+      return;
+    }
+
+    return true;
   }
 }
 

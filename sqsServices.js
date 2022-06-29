@@ -6,7 +6,7 @@ var sqs = new AWS.SQS();
 class SQSServices {
   constructor() {}
 
-  PushToSQS(data, sqsUrl) {
+  async PushToSQS(data, sqsUrl) {
     try {
       var params = {
         MessageBody: JSON.stringify(data),
