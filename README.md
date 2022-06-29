@@ -14,7 +14,7 @@ ma-notification-center is a package to be used by mobilearts to send internal no
 
 ## Installation
 
-Install the dependencies and devDependencies and start the server.
+Install the dependencies.
 
 ```sh
 cd yourpath
