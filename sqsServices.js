@@ -12,7 +12,7 @@ class SQSServices {
         MessageBody: JSON.stringify(data),
         QueueUrl: sqsUrl,
       };
-      sqs
+      return await sqs
         .sendMessage(params)
         .promise()
         .then((response) => {
