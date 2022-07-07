@@ -43,7 +43,14 @@ class MA_Notifications {
     }
   }
 
-  validateEmailParams(to_emails, cc_emails, subject, body_text, body_html) {
+  validateEmailParams(
+    to_emails,
+    cc_emails,
+    bcc_emails,
+    subject,
+    body_text,
+    body_html
+  ) {
     for (let i = 0; i < to_emails.length; i++) {
       if (EmailValidator.validate(to_emails[i]) == false) {
         console.log("invalid to email address", to_emails[i]);
@@ -54,6 +61,12 @@ class MA_Notifications {
     for (let i = 0; i < cc_emails.length; i++) {
       if (EmailValidator.validate(cc_emails[i]) == false) {
         console.log("invalid cc email address", cc_emails[i]);
+        return;
+      }
+    }
+    for (let i = 0; i < bcc_emails.length; i++) {
+      if (EmailValidator.validate(bcc_emails[i]) == false) {
+        console.log("invalid cc email address", bcc_emails[i]);
         return;
       }
     }
@@ -74,11 +87,19 @@ class MA_Notifications {
     return true;
   }
 
-  async sendEmail(to_emails, cc_emails, subject, body_text, body_html) {
+  async sendEmail(
+    to_emails,
+    cc_emails,
+    bcc_emails,
+    subject,
+    body_text,
+    body_html
+  ) {
     var url = this.arn + "email";
     let ok_to_send = this.validateEmailParams(
       to_emails,
       cc_emails,
+      bcc_emails,
       subject,
       body_text,
       body_html
@@ -87,6 +108,7 @@ class MA_Notifications {
       let email_params = {
         to_emails: to_emails,
         cc_emails: cc_emails,
+        bcc_emails: bcc_emails,
         message: {
           subject: subject,
           body_text: body_text,

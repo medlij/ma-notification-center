@@ -1,4 +1,4 @@
-# ma-notification-center version #2
+# ma-notification-center version 
 
 
 ma-notification-center is a package to be used by mobilearts to send internal notifications via sms, email or telegram.
@@ -32,8 +32,8 @@ const notifications = new MA_Notifications();
 For Email
 
 ```sh
-/*to_emails and cc_emails are arrays*/
-notifications.sendEmail(to_emails,cc_emails,subject,text_body,text_html)
+/*to_emails, cc_emails and bcc_emails are arrays*/
+notifications.sendEmail(to_emails,cc_emails,bcc_emails,subject,text_body,text_html)
 ```
 
 For Telegram
